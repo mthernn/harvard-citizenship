@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Harvard Citizenship Tutor Ranker</title>
+  <title>Harvard Citizenship Tutor Ranker and Matcher</title>
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
@@ -11,76 +11,79 @@
   <header class="hero">
     <div class="hero-inner">
       <p class="eyebrow">Harvard IOP Citizenship Tutoring Program</p>
-      <h1>Tutor Seniority Ranker</h1>
-      <p class="subtitle">Upload the Excel spreadsheet downloaded from the Google Form. The ranking runs locally in your browser and creates a downloadable seniority-ordered workbook.</p>
+      <h1>Tutor Ranker and Tutee Matcher</h1>
+      <p class="subtitle">Upload Google Form Excel exports, rank tutors by seniority, and generate optimized tutor-tutee matches entirely in your browser.</p>
+      <div class="privacy">No spreadsheet data is uploaded or stored. All processing happens locally in this page.</div>
     </div>
   </header>
 
-  <main class="container">
-    <section class="card upload-card">
-      <div>
-        <h2>1. Upload Google Form responses</h2>
-        <p>Accepted formats: <strong>.xlsx</strong>, <strong>.xls</strong>, or <strong>.csv</strong>. No spreadsheet data is sent to a server.</p>
-      </div>
-      <label class="file-drop" for="fileInput">
-        <span class="file-drop-title">Choose spreadsheet</span>
-        <span id="fileName" class="file-name">No file selected</span>
-      </label>
-      <input id="fileInput" type="file" accept=".xlsx,.xls,.csv" />
-    </section>
-
-    <section class="card actions-card">
-      <h2>2. Rank tutors</h2>
-      <div class="button-row">
-        <button id="rankButton" class="primary" disabled>Rank tutors</button>
-        <button id="downloadButton" class="secondary" disabled>Download ranked Excel</button>
-        <button id="resetButton" class="ghost" disabled>Reset</button>
-      </div>
-      <p id="status" class="status">Upload a spreadsheet to begin.</p>
-    </section>
-
-    <section id="summaryCard" class="card hidden">
-      <h2>Ranking summary</h2>
-      <div id="summaryGrid" class="summary-grid"></div>
-    </section>
-
-    <section id="diagnosticsCard" class="card hidden">
-      <h2>Diagnostics</h2>
-      <div id="diagnostics" class="diagnostics"></div>
-    </section>
-
-    <section id="previewCard" class="card hidden">
-      <div class="preview-header">
+  <main>
+    <section class="panel">
+      <div class="section-heading">
+        <span class="step">1</span>
         <div>
-          <h2>Ranked preview</h2>
-          <p>Showing the first 50 ranked tutors.</p>
+          <h2>Upload tutor membership spreadsheet</h2>
+          <p>Use the Excel file downloaded from the tutor Google Form. The system will rank tutors using the program seniority rules.</p>
         </div>
       </div>
-      <div class="table-wrap">
-        <table id="previewTable"></table>
+      <div class="upload-box">
+        <input id="tutorFile" type="file" accept=".xlsx,.xls,.csv" />
+        <button id="rankTutorsButton" class="primary">Rank tutors</button>
       </div>
+      <div id="tutorStatus" class="status muted">No tutor file loaded yet.</div>
+      <div id="tutorSummary" class="cards"></div>
+      <div class="table-wrap"><table id="tutorTable"></table></div>
+      <div class="actions"><button id="downloadRankedTutorsButton" disabled>Download ranked tutor Excel</button></div>
     </section>
 
-    <section class="card rules-card">
-      <h2>Seniority rules used</h2>
+    <section class="panel">
+      <div class="section-heading">
+        <span class="step">2</span>
+        <div>
+          <h2>Upload internal tutee spreadsheet</h2>
+          <p>After tutors have been ranked, upload the internal tutee Excel file to generate optimized matches.</p>
+        </div>
+      </div>
+
+      <div class="settings-grid">
+        <label>Maximum sessions per tutor per week
+          <input id="maxSessions" type="number" min="1" max="10" value="2" />
+        </label>
+        <label>Default tutors/session for N-400 stage
+          <input id="n400Tutors" type="number" min="1" max="5" value="1" />
+        </label>
+        <label>Default tutors/session for interview stage
+          <input id="interviewTutors" type="number" min="1" max="5" value="2" />
+        </label>
+        <label>Default tutors/session for intensive stage
+          <input id="intensiveTutors" type="number" min="1" max="5" value="3" />
+        </label>
+      </div>
+
+      <div class="upload-box">
+        <input id="tuteeFile" type="file" accept=".xlsx,.xls,.csv" />
+        <button id="matchButton" class="primary" disabled>Generate matches</button>
+      </div>
+      <div id="matchStatus" class="status muted">Rank tutors first, then upload the tutee file.</div>
+      <div id="matchSummary" class="cards"></div>
+      <div class="table-wrap"><table id="matchTable"></table></div>
+      <div class="actions"><button id="downloadMatchesButton" disabled>Download final matching Excel</button></div>
+    </section>
+
+    <section class="panel small-text">
+      <h2>Matching rules implemented</h2>
       <ol>
-        <li>Director, Secretary, current Board Member</li>
-        <li>Former Director, former Secretary, former Board Member</li>
-        <li>Years since selected for former highest position, largest to smallest</li>
-        <li>Returning Member</li>
-        <li>Class Year, smallest to largest</li>
-        <li>Number of languages other than English, largest to smallest</li>
-        <li>Specific language priority from Spanish through Latin</li>
-        <li>Birthdate, oldest to youngest</li>
-        <li>Surname, then Forename, A to Z</li>
+        <li>Returning tutor continuity is processed first. If a tutor listed a returning tutee and at least one availability slot overlaps, the tutor is assigned to that tutee first.</li>
+        <li>Availability is a hard rule for every assigned tutor.</li>
+        <li>Each tutee session must include at least one tutor who speaks the tutee's native language, unless the session is flagged for manual review.</li>
+        <li>New tutees are prioritized before returning tutees after continuity matches.</li>
+        <li>The number of tutors needed depends on naturalization stage, returning status, and requested weekly sessions.</li>
+        <li>In-person or Zoom preference is optimized after hard rules, and lower-ranked tutors may have their preference overridden when needed.</li>
       </ol>
     </section>
   </main>
 
-  <footer class="footer">
-    <p>Built for semester onboarding and tutor-tutee matching.</p>
-  </footer>
-
+  <footer>Built for the Harvard IOP Citizenship Tutoring Program.</footer>
   <script src="script.js"></script>
 </body>
 </html>
