@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Harvard Citizenship Tutor Ranker</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <p class="eyebrow">Harvard IOP Citizenship Tutoring Program</p>
+      <h1>Tutor Seniority Ranker</h1>
+      <p class="subtitle">Upload the Excel spreadsheet downloaded from the Google Form. The ranking runs locally in your browser and creates a downloadable seniority-ordered workbook.</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card upload-card">
+      <div>
+        <h2>1. Upload Google Form responses</h2>
+        <p>Accepted formats: <strong>.xlsx</strong>, <strong>.xls</strong>, or <strong>.csv</strong>. No spreadsheet data is sent to a server.</p>
+      </div>
+      <label class="file-drop" for="fileInput">
+        <span class="file-drop-title">Choose spreadsheet</span>
+        <span id="fileName" class="file-name">No file selected</span>
+      </label>
+      <input id="fileInput" type="file" accept=".xlsx,.xls,.csv" />
+    </section>
+
+    <section class="card actions-card">
+      <h2>2. Rank tutors</h2>
+      <div class="button-row">
+        <button id="rankButton" class="primary" disabled>Rank tutors</button>
+        <button id="downloadButton" class="secondary" disabled>Download ranked Excel</button>
+        <button id="resetButton" class="ghost" disabled>Reset</button>
+      </div>
+      <p id="status" class="status">Upload a spreadsheet to begin.</p>
+    </section>
+
+    <section id="summaryCard" class="card hidden">
+      <h2>Ranking summary</h2>
+      <div id="summaryGrid" class="summary-grid"></div>
+    </section>
+
+    <section id="diagnosticsCard" class="card hidden">
+      <h2>Diagnostics</h2>
+      <div id="diagnostics" class="diagnostics"></div>
+    </section>
+
+    <section id="previewCard" class="card hidden">
+      <div class="preview-header">
+        <div>
+          <h2>Ranked preview</h2>
+          <p>Showing the first 50 ranked tutors.</p>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table id="previewTable"></table>
+      </div>
+    </section>
+
+    <section class="card rules-card">
+      <h2>Seniority rules used</h2>
+      <ol>
+        <li>Director, Secretary, current Board Member</li>
+        <li>Former Director, former Secretary, former Board Member</li>
+        <li>Years since selected for former highest position, largest to smallest</li>
+        <li>Returning Member</li>
+        <li>Class Year, smallest to largest</li>
+        <li>Number of languages other than English, largest to smallest</li>
+        <li>Specific language priority from Spanish through Latin</li>
+        <li>Birthdate, oldest to youngest</li>
+        <li>Surname, then Forename, A to Z</li>
+      </ol>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Built for semester onboarding and tutor-tutee matching.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
